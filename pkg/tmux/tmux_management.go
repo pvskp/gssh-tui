@@ -1,9 +1,10 @@
 package tmux_management
 
 import (
-    "os"
-    "os/exec"
-    "errors"
+	"errors"
+	"fmt"
+	"os"
+	"os/exec"
 )
 
 func onTmuxSession () (onSession bool, err error) {
@@ -25,10 +26,26 @@ func identifySession () (name string, err error) {
         os.Exit(1)
     }
 
-    cmd := exec.Command("tmux", "display", "-p", "#s")
+    cmd := exec.Command("tmux", "display", "-p", "#S")
 
-    err = cmd.Run()
+    output, err := cmd.Output()
+
+    if err != nil {
+        return name, err
+    }
+
+    name = string(output)
     
     return name, nil
+}
+
+func createNewWindow (sessionName string, newWindowName string) (couldCreateWindow bool, err error) {
+    cmd := exec.Command("tmux", "new-window", "-t", sessionName, "-n", newWindowName)
+    if err := cmd.Run(); err != nil {
+        return false, err
+    }
+
+    return true, nil
+
 }
 
