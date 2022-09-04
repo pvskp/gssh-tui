@@ -46,6 +46,10 @@ func createNewWindow (sessionName string, newWindowName string) (couldCreateWind
     }
 
     return true, nil
-
 }
 
+func main () {
+    if couldCreateWindow, _ := createNewWindow("main", "testeWindow"); couldCreateWindow {
+        fmt.Println("A new window was created.")
+    }
+}
