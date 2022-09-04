@@ -39,11 +39,17 @@ func identifySession () (name string, err error) {
     return name, nil
 }
 
-func createNewWindow (sessionName string, newWindowName string) (couldCreateWindow bool, err error) {
+func createNewWindow (sessionName string, newWindowName string, command ...string) (couldCreateWindow bool, err error) {
     cmd := exec.Command("tmux", "new-window", "-t", sessionName, "-n", newWindowName)
     if err := cmd.Run(); err != nil {
         return false, err
     }
+
+    if len(command) => 0 {
+        // cmd = exec.Command("tmux")
+    }
+
+
 
     return true, nil
 }
