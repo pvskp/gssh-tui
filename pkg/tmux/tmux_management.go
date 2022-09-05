@@ -39,23 +39,54 @@ func identifySession () (name string, err error) {
     return name, nil
 }
 
-func createNewWindow (sessionName string, newWindowName string, command ...string) (couldCreateWindow bool, err error) {
-    cmd := exec.Command("tmux", "new-window", "-t", sessionName, "-n", newWindowName)
-    if err := cmd.Run(); err != nil {
+func CreateNewWindow (sessionName string, newWindowName string, command ...string) (bool, error) {
+    args := []string{"new-window", "-t", sessionName, "-n", newWindowName}
+    cmd := exec.Command("tmux", args...)
+    if output, err := cmd.Output(); err != nil {
+        fmt.Println("Error!")
+        fmt.Println(string(output))
         return false, err
     }
 
-    if len(command) => 0 {
+    if len(command) >= 0 {
+        fmt.Println("len(command) is bigger than 0.")
+        fmt.Println(command)
         // cmd = exec.Command("tmux")
+        windowIdentifier := sessionName + ":" + newWindowName
+        args = []string{"send-keys", "-t", windowIdentifier}
+        
+        for _, value := range command {
+            args = append(args, value)
+        }
+
+        args = append(args, "ENTER")
+
+        fmt.Println(args)
+
+        cmd = exec.Command("tmux", args...)
+        
+        if output, err := cmd.Output(); err != nil {
+            fmt.Println(output)
+            return false, err
+        }
     }
-
-
 
     return true, nil
 }
 
+func RenameWindow (sessionName, oldWindowName, newWindowName string) (err error) {
+    windowIdentifier := sessionName + ":" + oldWindowName
+    cmd := exec.Command("tmux", "rename-window", "-t", windowIdentifier, newWindowName)
+
+    if err = cmd.Run(); err != nil {
+        return err
+    }
+
+    return nil
+}
+
 func main () {
-    if couldCreateWindow, _ := createNewWindow("main", "testeWindow"); couldCreateWindow {
+    if couldCreateWindow, _ := CreateNewWindow("main", "testeWindow", "ssh", "vps"); couldCreateWindow {
         fmt.Println("A new window was created.")
     }
 }
