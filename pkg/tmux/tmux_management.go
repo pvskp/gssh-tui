@@ -1,29 +1,31 @@
-package tmux_management
+package tmuxmgt
 
 import (
 	"errors"
 	"fmt"
 	"os"
 	"os/exec"
+    "strings"
 )
 
 func onTmuxSession () (onSession bool, err error) {
     if (len(os.Getenv("TMUX")) > 0) {
-        return true, nil
+        onSession = true
+        return 
     }
 
     err = errors.New("Cannot check if tmux is running")
-    return false, err
+    return
 }
 
 // Identify actual sesssion
-func identifySession () (name string, err error) {
+func IdentifySession () (name string, err error) {
     // Check if is on a tmux session
     onTmux, err := onTmuxSession()
 
     if (!onTmux) {
         err = errors.New("Not on a tmux session. Aborting.")
-        os.Exit(1)
+        return
     }
 
     cmd := exec.Command("tmux", "display", "-p", "#S")
@@ -31,47 +33,42 @@ func identifySession () (name string, err error) {
     output, err := cmd.Output()
 
     if err != nil {
-        return name, err
+        return
     }
 
     name = string(output)
+    name = strings.ReplaceAll(name, "\n", "")
     
-    return name, nil
+    return
 }
 
-func CreateNewWindow (sessionName string, newWindowName string, command ...string) (bool, error) {
+func CreateNewWindow (sessionName string, newWindowName string, command ...string) (couldCreateSession bool, err error) {
     args := []string{"new-window", "-t", sessionName, "-n", newWindowName}
+    fmt.Println(args)
     cmd := exec.Command("tmux", args...)
-    if output, err := cmd.Output(); err != nil {
-        fmt.Println("Error!")
-        fmt.Println(string(output))
-        return false, err
+    if err = cmd.Run(); err != nil {
+        return 
     }
 
     if len(command) >= 0 {
         fmt.Println("len(command) is bigger than 0.")
         fmt.Println(command)
-        // cmd = exec.Command("tmux")
+
         windowIdentifier := sessionName + ":" + newWindowName
         args = []string{"send-keys", "-t", windowIdentifier}
         
-        for _, value := range command {
-            args = append(args, value)
-        }
-
+        stringCommand := strings.Join(command, " ")
+        args = append(args, stringCommand)
         args = append(args, "ENTER")
-
-        fmt.Println(args)
-
         cmd = exec.Command("tmux", args...)
         
-        if output, err := cmd.Output(); err != nil {
-            fmt.Println(output)
-            return false, err
+        if err = cmd.Run(); err != nil {
+            return 
         }
     }
 
-    return true, nil
+    couldCreateSession = true
+    return
 }
 
 func RenameWindow (sessionName, oldWindowName, newWindowName string) (err error) {
@@ -79,14 +76,9 @@ func RenameWindow (sessionName, oldWindowName, newWindowName string) (err error)
     cmd := exec.Command("tmux", "rename-window", "-t", windowIdentifier, newWindowName)
 
     if err = cmd.Run(); err != nil {
-        return err
+        err = fmt.Errorf("cmd.Run() returned: %w", err)
+        return
     }
 
-    return nil
-}
-
-func main () {
-    if couldCreateWindow, _ := CreateNewWindow("main", "testeWindow", "ssh", "vps"); couldCreateWindow {
-        fmt.Println("A new window was created.")
-    }
+    return
 }
