@@ -1,27 +1,21 @@
 package main
 
 import (
-	// "github.com/rivo/tview"
+	"github.com/rivo/tview"
 )
 
 func main() {
-	// box := tview.NewBox().SetBorder(true).SetTitle("Hello, world!")
 	// app := tview.NewApplication()
+	// flex := tview.NewFlex()
+    // flexLeft := flex.AddItem(tview.NewBox().SetBorder(true).SetTitle("Left (1/2 x width of Top)"), 0, 1, false)
+    // flexRight := flex.AddItem(tview.NewBox().SetBorder(true).SetTitle("Right (1/2 x width of Top)"), 0, 1, false)
 
-    // list := tview.NewList().
-                            // AddItem("List item 1", "Some explanatory text", 'a', nil).
-                            // AddItem("List item 2", "Some explanatory text", 'b', nil).
-                            // AddItem("List item 3", "Some explanatory text", 'c', nil).
-                            // AddItem("List item 4", "Some explanatory text", 'd', nil).
-                            // AddItem("Quit", "Press to exit", 'q', func() {
-                                // app.Stop()
-    // })
+    // flexLeft.AddItem()
 
-	// if err := app.SetRoot(list, true).SetFocus(list).Run(); err != nil {
-	// 	panic(err)
-	// }
+    // flexRight.AddItem(tview.NewBox().SetBorder(true).SetTitle("Right (1/2 x width of Top)"), 0, 1, false)
+    // flexLeft.AddItem(tview.NewBox().SetBorder(true).SetTitle("Right (1/2 x width of Top)"), 0, 1, false)
 
-	// if err := app.SetRoot(box, true).Run(); err != nil {
-	// 	panic(err)
+	// if err := app.SetRoot(flex, true).SetFocus(flex).Run(); err != nil {
+		// panic(err)
 	// }
 }
